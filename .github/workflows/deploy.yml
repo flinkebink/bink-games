@@ -4,6 +4,12 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      capture_screenshots:
+        description: "Regenerate screenshots for all games"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -23,19 +29,64 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Decide whether screenshots are needed
+        id: screenshots
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            if [[ "${{ inputs.capture_screenshots }}" == "true" ]]; then
+              echo "targets=all" >> "$GITHUB_OUTPUT"
+            else
+              echo "targets=" >> "$GITHUB_OUTPUT"
+            fi
+            exit 0
+          fi
+
+          before="${{ github.event.before }}"
+          after="${{ github.sha }}"
+          if [[ -n "$before" && "$before" != "0000000000000000000000000000000000000000" ]]; then
+            new_games=$(git diff --diff-filter=A --name-only "$before" "$after" -- 'games/*/index.html' \
+              | sed -nE 's#^games/([^/]+)/index\.html$#\1#p' | paste -sd ' ' -)
+          else
+            new_games=""
+          fi
+          echo "targets=$new_games" >> "$GITHUB_OUTPUT"
+          if [[ -n "$new_games" ]]; then
+            echo "New game(s) detected: $new_games"
+          else
+            echo "No new games; skipping screenshot generation."
+          fi
 
       - name: Set up Node.js
+        if: steps.screenshots.outputs.targets != ''
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
+      - name: Cache Playwright browser
+        if: steps.screenshots.outputs.targets != ''
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-chromium-${{ hashFiles('package.json') }}
+
       - name: Install Playwright
+        if: steps.screenshots.outputs.targets != ''
         run: |
-          npm install
+          npm install --no-audit --no-fund
           npx playwright install --with-deps chromium
 
       - name: Capture game screenshots
-        run: npm run screenshots
+        if: steps.screenshots.outputs.targets != ''
+        run: |
+          if [[ "${{ steps.screenshots.outputs.targets }}" == "all" ]]; then
+            npm run screenshots
+          else
+            npm run screenshots -- ${{ steps.screenshots.outputs.targets }}
+          fi
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

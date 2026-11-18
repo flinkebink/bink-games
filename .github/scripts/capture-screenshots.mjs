@@ -93,7 +93,8 @@ try {
         await page.keyboard.up("d");
         await page.mouse.click(850, 360);
         await sleep(900);
-      },
+      }
+    },
     {
       name: "Polyfall",
       path: "/games/polyfall/",
@@ -109,10 +110,23 @@ try {
     }
   ];
 
-  for (const game of captures) {
+  const requested = process.argv.slice(2);
+  const selected = requested.length
+    ? requested.flatMap(slug => {
+        const known = captures.find(game => game.path === `/games/${slug}/`);
+        return known ? [known] : [{
+          name: slug,
+          path: `/games/${slug}/`,
+          file: `games/${slug}/preview.png`,
+          play: async () => {}
+        }];
+      })
+    : captures;
+
+  for (const game of selected) {
     const page = await context.newPage();
     page.on("pageerror", error => console.error(`[${game.name}] ${error.message}`));
-    await page.goto(`http://127.0.0.1:${port}${game.path}`, { waitUntil: "networkidle" });
+    await page.goto(`http://127.0.0.1:${port}${game.path}`, { waitUntil: "networkidle", timeout: 30000 });
     await page.evaluate(() => document.fonts?.ready);
     await game.play(page);
     await page.screenshot({ path: game.file, fullPage: false, animations: "disabled" });

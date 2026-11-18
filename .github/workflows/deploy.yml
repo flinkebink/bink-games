@@ -86,9 +86,7 @@ jobs:
 
       - name: Install Playwright
         if: steps.screenshots.outputs.targets != ''
-        run: |
-          npm install --no-audit --no-fund
-          npx playwright install --with-deps chromium
+        run: npx playwright install --with-deps chromium
 
       - name: Capture game screenshots
         if: steps.screenshots.outputs.targets != ''

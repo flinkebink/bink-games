@@ -125,6 +125,9 @@ try {
 
   for (const game of selected) {
     const page = await context.newPage();
+    if (game.name === "Flappy Clucker") {
+      await page.setViewportSize({ width: 390, height: 844 });
+    }
     page.on("pageerror", error => console.error(`[${game.name}] ${error.message}`));
     await page.goto(`http://127.0.0.1:${port}${game.path}`, { waitUntil: "networkidle", timeout: 30000 });
     await page.evaluate(() => document.fonts?.ready);

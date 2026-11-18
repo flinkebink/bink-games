@@ -4,6 +4,7 @@ import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { parse } from "espree";
+import Particle from "../games/flappy-clucker/js/Particle.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const gamesRoot = path.join(root, "games");
@@ -84,3 +85,14 @@ for (const jsFile of jsFiles) {
     }
   });
 }
+
+
+test("Flappy Clucker burst particles implement the update contract", () => {
+  const particles = Particle.createBurst(12, 34, 8, "f", "#fff", () => 0.5);
+  assert.equal(particles.length, 8);
+  for (const particle of particles) {
+    assert.ok(particle instanceof Particle, "Burst effects must create Particle instances");
+    assert.equal(typeof particle.update, "function", "Every particle must be updateable");
+    assert.equal(typeof particle.update(), "boolean", "Particle.update() must report whether it remains alive");
+  }
+});

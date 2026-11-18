@@ -16,8 +16,10 @@
     header p { margin:16px auto 0; max-width:560px; color:var(--muted); font-size:1.08rem; }
     main { max-width:1100px; margin:0 auto; padding:10px 24px 76px; }
     .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr)); gap:18px; }
-    .game { display:flex; min-height:220px; flex-direction:column; padding:24px; border:1px solid var(--line); border-radius:22px; background:linear-gradient(145deg,#202238,var(--panel)); box-shadow:0 16px 40px #0002; transition:transform .18s,border-color .18s; }
+    .game { display:flex; min-height:220px; flex-direction:column; padding:16px; border:1px solid var(--line); border-radius:22px; background:linear-gradient(145deg,#202238,var(--panel)); box-shadow:0 16px 40px #0002; transition:transform .18s,border-color .18s; }
     .game:hover { transform:translateY(-4px); border-color:#7770ba; }
+    .preview { display:block; width:100%; aspect-ratio:16/9; object-fit:cover; border-radius:14px; border:1px solid #ffffff22; background:#10111b; }
+    .game-body { display:flex; flex:1; flex-direction:column; padding:8px 8px 4px; }
     .number { color:#a99dff; font-size:.8rem; font-weight:800; letter-spacing:.12em; }
     h2 { margin:18px 0 6px; font-size:1.55rem; letter-spacing:-.03em; }
     .game p { margin:0 0 24px; color:var(--muted); }
@@ -37,22 +39,31 @@
     <section class="grid" aria-label="Available games">
       <!-- To add a game: copy a game card and update its title, description, and relative link. -->
       <article class="game">
+        <img class="preview" src="games/backrooms-brawl/preview.svg" alt="Backrooms Brawl game preview">
+        <div class="game-body">
         <div class="number">GAME 01</div>
         <h2>Backrooms Brawl</h2>
         <p>Step into the Backrooms and see if you can survive the brawl.</p>
         <a class="play" href="games/backrooms-brawl/">Play now <span aria-hidden="true">→</span></a>
+        </div>
       </article>
       <article class="game">
+        <img class="preview" src="games/flappy-clucker/preview.svg" alt="Flappy Clucker game preview">
+        <div class="game-body">
         <div class="number">GAME 02</div>
         <h2>Flappy Clucker</h2>
         <p>Flap, dodge, and try to beat your best run.</p>
         <a class="play" href="games/flappy-clucker/">Play now <span aria-hidden="true">→</span></a>
+        </div>
       </article>
       <article class="game">
+        <img class="preview" src="games/headfirst/preview.svg" alt="Headfirst game preview">
+        <div class="game-body">
         <div class="number">GAME 03</div>
         <h2>Headfirst</h2>
         <p>Take the plunge and find out how far you can get.</p>
         <a class="play" href="games/headfirst/">Play now <span aria-hidden="true">→</span></a>
+        </div>
       </article>
     </section>
   </main>

@@ -93,6 +93,18 @@ try {
         await page.keyboard.up("d");
         await page.mouse.click(850, 360);
         await sleep(900);
+      },
+    {
+      name: "Polyfall",
+      path: "/games/polyfall/",
+      file: "games/polyfall/preview.png",
+      play: async page => {
+        await page.locator("#start").click();
+        for (const key of ["ArrowUp", "ArrowLeft", "Space", "ArrowRight", "ArrowUp", "Space"]) {
+          await page.keyboard.press(key);
+          await sleep(180);
+        }
+        await sleep(500);
       }
     }
   ];

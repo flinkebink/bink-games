@@ -21,11 +21,9 @@ export default class Board {
   }
 
   lock(piece) {
+    if (piece.cells.some(([, cy]) => piece.y + cy < 0)) return false;
     for (const [cx, cy] of piece.cells) {
-      const x = piece.x + cx;
-      const y = piece.y + cy;
-      if (y < 0) return false;
-      this.cells[y][x] = piece.color;
+      this.cells[piece.y + cy][piece.x + cx] = piece.color;
     }
     return true;
   }

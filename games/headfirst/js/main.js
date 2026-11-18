@@ -250,9 +250,7 @@ function draw(){
  if(aimT){c.strokeStyle='rgba(255,226,122,.7)';c.lineWidth=3;c.beginPath();c.arc(aimT.ox,aimT.oy,40,0,6.283);c.stroke();
   const dx=aimT.x-aimT.ox,dy=aimT.y-aimT.oy,l=Math.min(Math.hypot(dx,dy),60)/(Math.hypot(dx,dy)||1);
   c.fillStyle='rgba(255,226,122,.8)';c.beginPath();c.arc(aimT.ox+dx*l*.66,aimT.oy+dy*l*.66,16,0,6.283);c.fill()}
- const tx=aimT?aimT.x:mouse.has?mouse.x:null,ty=aimT?aimT.y:mouse.y;
- if(false){const dx=tx-W/2,dy=ty-H/2,d=Math.hypot(dx,dy),m=R*(GL+.2);
-  if(d>m){c.strokeStyle='rgba(255,70,70,.7)';c.lineWidth=2.5;c.setLineDash([R*.12,R*.16]);c.beginPath();c.moveTo(W/2+dx/d*m,H/2+dy/d*m);c.lineTo(tx,ty);c.stroke();c.setLineDash([])}}
+
  if(mouse.has&&mouse.down&&!aimT&&st=='play'){const q=mouse.x,w=mouse.y;c.strokeStyle='#fff';c.lineWidth=2.5;c.beginPath();c.arc(q,w,12,0,6.283);c.moveTo(q-20,w);c.lineTo(q-6,w);c.moveTo(q+6,w);c.lineTo(q+20,w);c.moveTo(q,w-20);c.lineTo(q,w-6);c.moveTo(q,w+6);c.lineTo(q,w+20);c.stroke()}
  if(jo){c.strokeStyle='rgba(255,246,224,.6)';c.lineWidth=3;c.beginPath();c.arc(jo.ox,jo.oy,40,0,6.283);c.stroke();
   const dx=jo.x-jo.ox,dy=jo.y-jo.oy,l=Math.min(Math.hypot(dx,dy),60)/(Math.hypot(dx,dy)||1);

@@ -49,6 +49,9 @@ for (const htmlFile of htmlFiles) {
     assert.match(html, /<!doctype html>/i, "Missing doctype");
     assert.match(html, /<html\b/i, "Missing html element");
     assert.match(html, /<\/html\s*>/i, "Missing closing html element");
+    if (relative === "games/flappy-clucker/index.html") {
+      assert.match(html, /Particle\.js\?v=\d+/, "Particle module import must be cache-busted after updates");
+    }
 
     const gameDirectory = path.dirname(htmlFile);
     const scriptTags = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi)];
@@ -80,7 +83,8 @@ for (const jsFile of jsFiles) {
     }));
     const imports = source.matchAll(/(?:\bfrom\s*|\bimport\s*)["'](\.{1,2}\/[^"']+)["']/g);
     for (const match of imports) {
-      const target = path.resolve(path.dirname(jsFile), match[1]);
+      const importPath = match[1].split(/[?#]/, 1)[0];
+      const target = path.resolve(path.dirname(jsFile), importPath);
       await stat(target);
     }
   });

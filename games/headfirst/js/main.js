@@ -151,7 +151,7 @@ function update(dt){
   if(ammo<MAG){rl+=dt;if(rl>=G.rg*(1-.1*up[1])){rl=0;ammo++;hud()}}
   spT-=dt;if(spT<=0&&en.length<5+Math.min(14,kills/3|0)){spawnEn();spT=Math.max(.5,1.6-kills*.02)}
  }
- for(let i=bl.length-1;i>=0;i--){const b=bl[i];b.x+=b.vx*dt;b.y+=b.vy*dt;b.l-=dt;if(b.fx)bulletFx(b,dt);let gone=b.l<=0;
+ for(let i=bl.length-1;i>=0;i--){const b=bl[i];b.update(dt);if(b.fx)bulletFx(b,dt);let gone=b.l<=0;
   for(let j=en.length-1;j>=0&&!gone;j--){const e=en[j];
    if(Math.hypot(e.x-b.x,e.y-b.y)<e.s+r*.1*b.z){gone=true;hitFx(b,e)}}
   if(gone)bl.splice(i,1)}
@@ -162,7 +162,7 @@ function update(dt){
    if(lives<=0){st='over';$('t').textContent='Out of lives';$('d').textContent='You took down '+kills+' predators and earned '+coins+' coins. Spend them below.';$('go').textContent='Hunt again';renderShop();$('ov').hidden=false;$('ov').scrollTop=0;hud()}}}
  for(let i=fr.length-1;i>=0;i--){const f=fr[i];f.l-=dt;
   if(f.l<=0)fr.splice(i,1);else if(st=='play'&&Math.hypot(f.x-x,f.y-y)<r*.95){fr.splice(i,1);if(lives<5)lives++;hud()}}
- for(let i=pt.length-1;i>=0;i--){const p=pt[i];p.x+=p.vx*dt;p.y+=p.vy*dt;p.l-=dt;if(p.l<=0)pt.splice(i,1)}
+ for(let i=pt.length-1;i>=0;i--){const p=pt[i];p.update(dt);if(p.l<=0)pt.splice(i,1)}
  for(let i=po.length-1;i>=0;i--){po[i].y-=r*2*dt;po[i].l-=dt;if(po[i].l<=0)po.splice(i,1)}
  for(let i=rg.length-1;i>=0;i--){rg[i].l-=dt;if(rg[i].l<=0)rg.splice(i,1)}
  for(let i=sl.length-1;i>=0;i--){sl[i].l-=dt;if(sl[i].l<=0)sl.splice(i,1)}

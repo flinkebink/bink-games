@@ -55,7 +55,7 @@ for (const htmlFile of htmlFiles) {
       const [, attributes, source] = scriptTags[index];
       const src = attributes.match(/\bsrc\s*=\s*["']([^"']+)["']/i)?.[1];
       if (src && !/^(https?:|\/\/|data:)/i.test(src)) {
-        const target = path.resolve(gameDirectory, src);
+        const target = src.startsWith("/") ? path.join(root, src.slice(1)) : path.resolve(gameDirectory, src);
         await stat(target);
       }
       if (source.trim()) {

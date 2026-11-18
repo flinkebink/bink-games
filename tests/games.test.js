@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import espree from "espree";
+import { parse } from "espree";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const gamesRoot = path.join(root, "games");
@@ -60,7 +60,7 @@ for (const htmlFile of htmlFiles) {
       }
       if (source.trim()) {
         const module = /\btype\s*=\s*["']module["']/i.test(attributes);
-        assert.doesNotThrow(() => espree.parse(source, {
+        assert.doesNotThrow(() => parse(source, {
           ecmaVersion: "latest",
           sourceType: module ? "module" : "script",
         }), `Inline script ${index + 1} has invalid syntax`);
@@ -73,7 +73,7 @@ for (const jsFile of jsFiles) {
   const relative = path.relative(root, jsFile);
   test(`${relative}: parses and resolves local imports`, async () => {
     const source = await readFile(jsFile, "utf8");
-    assert.doesNotThrow(() => espree.parse(source, {
+    assert.doesNotThrow(() => parse(source, {
       ecmaVersion: "latest",
       sourceType: "module",
     }));

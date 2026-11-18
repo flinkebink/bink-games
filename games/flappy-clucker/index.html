@@ -90,7 +90,7 @@ function tap(px,py){
 function reset(){b=new Chicken(250,0);pipes=[];parts=[];pops=[];score=0;frame=0;disco=0;wf=0;qt=0;quip="";shake=0;flash=0;newBest=false;fx={};shield=0;inv=0;TAG=TAGS[Math.floor(Math.random()*TAGS.length)];runCoins=0}
 reset();
 function spd(){return(2.3+Math.min(score*.04,1.5))*(disco?1.25:1)*(fx.slow?.65:1)*(fx.fast?1.45:1)}
-function burst(px,py,n,k,col){for(var i=0;i<n;i++){var a=Math.random()*6.28,s=1+Math.random()*(k==="s"?5:3);parts.push({x:px,y:py,vx:Math.cos(a)*s-1,vy:Math.sin(a)*s,l:30+Math.random()*30,m:60,k:k,c:col||"#fff9e0",r:Math.random()*6})}}
+function burst(px,py,n,k,col){parts.push(...Particle.createBurst(px,py,n,k,col))}
 function pop(t,px,py,col){pops.push({t:t,x:px,y:py,l:60,c:col})}
 function addScore(n){coins+=n;runCoins+=n;sv();for(var i=0;i<n;i++){score++;if(quips[score]){quip=quips[score];qt=120}}sp=1}
 function flap(){

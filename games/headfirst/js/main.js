@@ -1,7 +1,7 @@
-import { Enemy } from './js/Enemy.js';
-import { Projectile } from './js/Projectile.js';
-import { Particle } from './js/Particle.js';
-import { GameLoop } from './js/GameLoop.js';
+import { Enemy } from './Enemy.js';
+import { Projectile } from './Projectile.js';
+import { Particle } from './Particle.js';
+import { GameLoop } from './GameLoop.js';
 
 const cv=document.getElementById('cv'),c=cv.getContext('2d'),$=id=>document.getElementById(id);
 let W,H,D;function rs(){D=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;cv.width=W*D;cv.height=H*D}

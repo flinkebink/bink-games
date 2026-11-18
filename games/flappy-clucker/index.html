@@ -20,7 +20,16 @@ canvas{width:min(100%,360px);max-height:78vh;aspect-ratio:360/560;border-radius:
 <h1>🐔 Flappy Clucker</h1>
 <canvas id="c"></canvas>
 <p>Tap, click or press Space to flap · grab power-ups, dodge the cursed ones · 1 point = 1 coin, spend it in the shop</p>
-<script>
+<script type="module">
+import Chicken from "./js/Chicken.js";
+import Pipe from "./js/Pipe.js";
+import Particle from "./js/Particle.js";
+import PowerUp from "./js/PowerUp.js";
+import AudioManager from "./js/AudioManager.js";
+import Renderer from "./js/Renderer.js";
+import InputController from "./js/InputController.js";
+import Game from "./js/Game.js";
+const audio = new AudioManager();
 var c=document.getElementById("c"),x=c.getContext("2d"),W=360,H=560,G=60,GAP=150,BX=90,D=Math.min(window.devicePixelRatio||1,2);
 c.width=W*D;c.height=H*D;
 var FONT="'Fredoka','Comic Sans MS','Chalkboard SE',cursive,sans-serif";try{document.fonts.load("700 20px Fredoka")}catch(e){}
@@ -32,7 +41,7 @@ var PAL=[[[110,198,255],[216,241,255]],[[255,110,90],[255,214,140]],[[12,16,48],
 for(var i=0;i<5;i++)clouds.push({x:Math.random()*W,y:30+Math.random()*200,s:.15+Math.random()*.3});
 for(i=0;i<45;i++)stars.push({x:Math.random()*W,y:Math.random()*300,t:Math.random()*6});
 function mix(a,z,t){return"rgb("+a.map(function(v,i){return Math.round(v+(z[i]-v)*t)}).join(",")+")"}
-function beep(f,d,ty,v){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();var o=ac.createOscillator(),g=ac.createGain(),t=ac.currentTime;o.type=ty||"square";o.frequency.setValueAtTime(f,t);o.frequency.exponentialRampToValueAtTime(f*1.5,t+d);g.gain.setValueAtTime(v||.05,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(ac.destination);o.start();o.stop(t+d)}catch(e){}}
+function beep(f,d,ty,v){audio.play(f,d,ty||"square",v||.05)}
 var SK=[
 {n:"Classic Gary",p:0,r:"#b8c4d9",b1:"#fff",b2:"#eee3cc",t:"#e4dccb",w:"#f6f1e4",cb:"#f0443c",a:""},
 {n:"Golden Gary",p:25,r:"#6fe39a",b1:"#fff3b0",b2:"#ffc933",t:"#e0a800",w:"#ffd966",cb:"#ff9f1c",a:"",tr:[45,10],au:"rgba(255,210,60,.9)"},
@@ -78,7 +87,7 @@ function tap(px,py){
  if(st==="ready"&&inR(px,py,SHOPB)){st="shop";return}
  if(st==="dead"&&dt>35&&inR(px,py,SHOPD)){reset();st="shop";return}
  flap()}
-function reset(){b={y:250,v:0};pipes=[];parts=[];pops=[];score=0;frame=0;disco=0;wf=0;qt=0;quip="";shake=0;flash=0;newBest=false;fx={};shield=0;inv=0;TAG=TAGS[Math.floor(Math.random()*TAGS.length)];runCoins=0}
+function reset(){b=new Chicken(250,0);pipes=[];parts=[];pops=[];score=0;frame=0;disco=0;wf=0;qt=0;quip="";shake=0;flash=0;newBest=false;fx={};shield=0;inv=0;TAG=TAGS[Math.floor(Math.random()*TAGS.length)];runCoins=0}
 reset();
 function spd(){return(2.3+Math.min(score*.04,1.5))*(disco?1.25:1)*(fx.slow?.65:1)*(fx.fast?1.45:1)}
 function burst(px,py,n,k,col){for(var i=0;i<n;i++){var a=Math.random()*6.28,s=1+Math.random()*(k==="s"?5:3);parts.push({x:px,y:py,vx:Math.cos(a)*s-1,vy:Math.sin(a)*s,l:30+Math.random()*30,m:60,k:k,c:col||"#fff9e0",r:Math.random()*6})}}
@@ -96,16 +105,16 @@ function step(){
  clouds.forEach(function(k){k.x-=k.s;if(k.x<-50)k.x=W+50});
  sk+=(score/8-sk)*.02;
  if(st!=="dead")off+=(st==="ready"||st==="shop")?1:s;
- for(i=parts.length-1;i>=0;i--){p=parts[i];p.x+=p.vx;p.y+=p.vy;if(p.k!=="t")p.vy+=p.k==="f"?.06:.15;if(p.k==="f")p.vx*=.98;if(--p.l<=0)parts.splice(i,1)}
+ for(i=parts.length-1;i>=0;i--){if(!parts[i].update())parts.splice(i,1)}
  for(i=pops.length-1;i>=0;i--){pops[i].y-=.7;if(--pops[i].l<=0)pops.splice(i,1)}
  if(flash>0)flash-=.05;if(shake>0)shake--;sp*=.9;wf*=.9;
  if(st==="ready"||st==="shop"){b.y=250+Math.sin(frame/12)*8;return}
  if(st==="dead"){dt++;if(b.y<H-G-14){b.v+=.5;b.y+=b.v}else b.y=H-G-14;return}
  b.v+=.4*(fx.floaty?.5:1)*(fx.heavy?1.6:1);b.y+=b.v;if(b.y<0){b.y=0;b.v=0}
  if(disco>0)disco--;if(inv>0)inv--;for(var fk in fx)if(--fx[fk]<=0){delete fx[fk];if(fk==="shrink")inv=Math.max(inv,50);pop(PU[fk].g?"Effect over!":"Curse lifted. Phew.",W/2,230,"#fff")}
- parts.push({x:BX-10,y:b.y+2,vx:-s,vy:0,l:22,m:22,k:"t",c:trailC(),r:disco?8:5});
- if(!pipes.length||pipes[pipes.length-1].x<W-210){var tp=60+Math.random()*230;pipes.push({x:W+10,base:tp,top:tp,amp:score>=8?10+Math.random()*28:0,ph:Math.random()*6,p:false,pu:null,po:0});if(score>=2&&Math.random()<.45)newPU(pipes[pipes.length-1])}
- for(i=pipes.length-1;i>=0;i--){p=pipes[i];p.x-=s;p.top=Math.max(45,Math.min(310,p.base+Math.sin(frame*.04+p.ph)*p.amp));
+ parts.push(new Particle({x:BX-10,y:b.y+2,vx:-s,vy:0,life:22,maxLife:22,kind:"t",color:trailC(),radius:disco?8:5}));
+ if(!pipes.length||pipes[pipes.length-1].x<W-210){var tp=60+Math.random()*230;pipes.push(new Pipe({x:W+10,base:tp,top:tp,amp:score>=8?10+Math.random()*28:0,ph:Math.random()*6,pu:null,po:0}));if(score>=2&&Math.random()<.45)newPU(pipes[pipes.length-1])}
+ for(i=pipes.length-1;i>=0;i--){p=pipes[i];p.update(s,frame,GAP);
   if(p.x<-60){pipes.splice(i,1);continue}
   var hr=fx.tiny?7:fx.big?19:12,hit=BX+hr>p.x+26-26*PW&&BX-hr<p.x+26+26*PW&&(b.y-hr<p.top||b.y+hr>p.top+GAP);
   if(hit&&!disco&&inv<=0){if(shield){shield=0;inv=60;shake=8;burst(BX,b.y,25,"s","#6fb1ff");pop("SHIELD POPPED!",BX,b.y-30,"#6fb1ff");beep(240,.2)}else{die();return}}
@@ -223,8 +232,8 @@ function draw(){
  if(flash>0){x.fillStyle="rgba(255,255,255,"+flash+")";x.fillRect(-10,-10,W+20,H+20)}
  x.restore();
 }
-function newPU(p){var Gd=["egg","slow","floaty","tiny","shield","shrink"],Bd=["heavy","fast","big","noodle"],bad=Math.random()<.35,a=bad?Bd:Gd;p.pu=a[Math.floor(Math.random()*a.length)];p.po=(Math.random()-.5)*(bad?90:40)}
-function grab(t,ex,ey){var u=PU[t];
+function newPU(p){var Gd=["egg","slow","floaty","tiny","shield","shrink"],Bd=["heavy","fast","big","noodle"];p.pu=PowerUp.randomType(Gd,Bd);p.po=(Math.random()-.5)*(bad?90:40)}
+function grab(t,ex,ey){var u=PowerUp.create(t,PU);
  if(t==="egg"){disco=300;addScore(3);flash=.6;pop("DISCO MODE!",W/2,200,"#ff6bf0")}
  else if(t==="shield")shield=1;
  else{fx[t]=u.d;var o={tiny:"big",big:"tiny",heavy:"floaty",floaty:"heavy",slow:"fast",fast:"slow"}[t];if(o)delete fx[o]}
@@ -243,9 +252,9 @@ function chips(){var L=[];for(var k in fx)L.push([k,fx[k]/PU[k].d]);if(shield)L.
  L.forEach(function(q,i){var u=PU[q[0]],cx=x0+i*w+w/2;x.fillStyle="rgba(15,25,70,.45)";rr(cx-16,112,32,36,10);x.fill();x.strokeStyle=u.c;x.lineWidth=2;rr(cx-16,112,32,36,10);x.stroke();x.font="16px serif";x.textAlign="center";x.fillStyle="#fff";x.fillText(u.e,cx,130);x.fillStyle=u.c;x.fillRect(cx-11,138,22*Math.max(0,Math.min(1,q[1])),3)})}
 function roast(n){return n<1?"Zero. Impressive, in a way.":n<5?"Even the pipes felt bad.":n<10?"Mediocre. Like gas station sushi.":n<20?"Not bad, feathered one.":"Okay, who are you?"}
 function loop(t){acc+=Math.min(t-last,100);last=t;while(acc>=16.67){step();acc-=16.67}draw();requestAnimationFrame(loop)}
-requestAnimationFrame(function(t){last=t;loop(t)});
-c.addEventListener("pointerdown",function(e){e.preventDefault();var r=c.getBoundingClientRect();tap((e.clientX-r.left)*W/r.width,(e.clientY-r.top)*H/r.height)});
-window.addEventListener("keydown",function(e){if(e.code==="Space"||e.code==="ArrowUp"){e.preventDefault();flap()}});
+const renderer = new Renderer(draw);
+new InputController(c,{onTap:tap,onFlap:flap,width:W,height:H});
+new Game({update:step,render:()=>renderer.render()}).start();
 </script>
 </body>
 </html>

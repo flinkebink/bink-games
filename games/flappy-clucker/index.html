@@ -232,7 +232,7 @@ function draw(){
  if(flash>0){x.fillStyle="rgba(255,255,255,"+flash+")";x.fillRect(-10,-10,W+20,H+20)}
  x.restore();
 }
-function newPU(p){var Gd=["egg","slow","floaty","tiny","shield","shrink"],Bd=["heavy","fast","big","noodle"];p.pu=PowerUp.randomType(Gd,Bd);p.po=(Math.random()-.5)*(bad?90:40)}
+function newPU(p){var Gd=["egg","slow","floaty","tiny","shield","shrink"],Bd=["heavy","fast","big","noodle"],bad=Math.random()<.35;p.pu=PowerUp.randomType(Gd,Bd,function(){return bad?0:1});p.po=(Math.random()-.5)*(bad?90:40)}
 function grab(t,ex,ey){var u=PowerUp.create(t,PU);
  if(t==="egg"){disco=300;addScore(3);flash=.6;pop("DISCO MODE!",W/2,200,"#ff6bf0")}
  else if(t==="shield")shield=1;

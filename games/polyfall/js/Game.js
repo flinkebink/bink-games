@@ -61,12 +61,12 @@ export default class Game {
     this.updatePreviews();
   }
 
-  move(dx, dy = 0) {
+  move(dx, dy = 0, awardDropPoints = false) {
     if (this.state !== "play" || !this.activePiece) return false;
     if (!this.board.canPlace(this.activePiece, dx, dy)) return false;
     this.activePiece.x += dx;
     this.activePiece.y += dy;
-    if (dy > 0) {
+    if (dy > 0 && awardDropPoints) {
       this.score++;
       this.updateStats();
     }
@@ -75,7 +75,7 @@ export default class Game {
   }
 
   softDrop() {
-    this.move(0, 1);
+    this.move(0, 1, true);
   }
 
   rotate(direction) {

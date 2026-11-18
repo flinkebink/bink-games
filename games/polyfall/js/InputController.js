@@ -34,6 +34,7 @@ export default class InputController {
         event.preventDefault();
         if (action === "down") {
           this.softDrop = true;
+          this.game.setSoftDrop(true);
           this.game.softDrop();
         } else {
           this.perform(action);
@@ -41,7 +42,10 @@ export default class InputController {
       });
       ["pointerup", "pointerleave", "pointercancel"].forEach(type => {
         button.addEventListener(type, () => {
-          if (action === "down") this.softDrop = false;
+          if (action === "down") {
+            this.softDrop = false;
+            this.game.setSoftDrop(false);
+          }
         });
       });
     });

@@ -12,7 +12,7 @@ on:
         type: boolean
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -47,6 +47,12 @@ jobs:
 
           before="${{ github.event.before }}"
           after="${{ github.sha }}"
+          message=$(git log -1 --format=%B "$after")
+          if grep -Fq '[capture-screenshots]' <<< "$message"; then
+            echo "targets=all" >> "$GITHUB_OUTPUT"
+            echo "Screenshot refresh requested by commit message."
+            exit 0
+          fi
           if [[ -n "$before" && "$before" != "0000000000000000000000000000000000000000" ]]; then
             new_games=$(git diff --diff-filter=A --name-only "$before" "$after" -- 'games/*/index.html' \
               | sed -nE 's#^games/([^/]+)/index\.html$#\1#p' | paste -sd ' ' -)
@@ -86,6 +92,19 @@ jobs:
             npm run screenshots
           else
             npm run screenshots -- ${{ steps.screenshots.outputs.targets }}
+          fi
+
+      - name: Commit generated screenshots
+        if: steps.screenshots.outputs.targets != ''
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add games/*/preview.png
+          if git diff --cached --quiet; then
+            echo "Screenshots are already up to date."
+          else
+            git commit -m "Cache generated game screenshots"
+            git push
           fi
 
       - name: Configure Pages
